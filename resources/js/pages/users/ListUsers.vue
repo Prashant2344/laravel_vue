@@ -3,7 +3,9 @@ import axios from 'axios';
 import { onMounted, reactive, ref } from 'vue';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
+import { useToastr } from '../../toastr';
 
+const toastr = useToastr();
 const users = ref([]);
 // const form = reactive({
 //     name: '',
@@ -29,7 +31,8 @@ const createUser = (values , {resetForm}) => {
         .then((response) => {
             users.value.unshift(response.data);
             $('#userFormModal').modal('hide');
-            resetForm()
+            resetForm();
+            toastr.success('User Created Successfully!');
         });
 }
 // const createUser = () => {
