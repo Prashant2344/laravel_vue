@@ -43,21 +43,28 @@ const editUserSchema = yup.object({
     })
 });
 
-const handleSubmit = (values) => {
+const handleSubmit = (values, actions) => {
     if(editing.value) {
-        updateUser(values);
+        updateUser(values, actions);
     } else {
-        createUser(values);
+        createUser(values, actions);
     }
 }
 
-const createUser = (values , {resetForm}) => {
+const createUser = (values , {resetForm, setFieldError, setErrors}) => {
     axios.post('/api/users', values)
         .then((response) => {
             users.value.unshift(response.data);
             $('#userFormModal').modal('hide');
             resetForm();
             toastr.success('User Created Successfully!');
+        }).catch((error) => {
+            //with setFieldError we have to define each field individaully 
+            // setFieldError('email',error.response.data.errors.email[0]);
+            //with setErrors, fields are identified automatically
+            if(error.response.data.errors) {
+                setErrors(error.response.data.errors);
+            }
         });
 }
 
@@ -82,17 +89,21 @@ const editUser = (user) => {
     };
 }
 
-const updateUser = (values) => {
+const updateUser = (values, {setErrors}) => {
     axios.put('/api/users/' + formValues.value.id, values)
         .then((response) => {
             const index = users.value.findIndex(user => user.id === response.data.id);
             users.value[index] = response.data;
             $('#userFormModal').modal('hide');
         }).catch((error) => {
+            if(error.response.data.errors) {
+                setErrors(error.response.data.errors);
+            }
             console.log(error);
-        }).finally(() => {
-            form.value.resetForm();
         });
+        // .finally(() => {
+        //     form.value.resetForm();
+        // });
 }
 // const createUser = () => {
 //     axios.post('/api/users', form)
