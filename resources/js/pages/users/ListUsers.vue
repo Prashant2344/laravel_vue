@@ -4,9 +4,18 @@ import { onMounted, reactive, ref } from 'vue';
 import { Form, Field } from 'vee-validate';
 import * as yup from 'yup';
 import { useToastr } from '../../toastr';
+import { error } from 'jquery';
 
 const toastr = useToastr();
 const users = ref([]);
+const editing = ref(false);
+const formValues = ref({
+    id: '',
+    name: '',
+    email: ''
+});
+const form = ref(null);
+const schema = ref(null);
 // const form = reactive({
 //     name: '',
 //     email: '',
@@ -20,11 +29,27 @@ const getUsers = () => {
         })
 }
 
-const schema = yup.object({
+const createUserSchema = yup.object({
     name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().required().min(8)
 });
+
+const editUserSchema = yup.object({
+    name: yup.string().required(),
+    email: yup.string().email().required(),
+    password: yup.string().when((password,schema) => {
+        return password ? schema.required().min(8) : schema;
+    })
+});
+
+const handleSubmit = (values) => {
+    if(editing.value) {
+        updateUser(values);
+    } else {
+        createUser(values);
+    }
+}
 
 const createUser = (values , {resetForm}) => {
     axios.post('/api/users', values)
@@ -33,6 +58,40 @@ const createUser = (values , {resetForm}) => {
             $('#userFormModal').modal('hide');
             resetForm();
             toastr.success('User Created Successfully!');
+        });
+}
+
+const addUser = () => {
+    editing.value = false;
+    $('#userFormModal').modal('show');
+    formValues.value = {
+        id: '',
+        name: '',
+        email: '',
+    };
+}
+
+const editUser = (user) => {
+    editing.value = true;
+    form.value.resetForm();
+    $('#userFormModal').modal('show');
+    formValues.value = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+    };
+}
+
+const updateUser = (values) => {
+    axios.put('/api/users/' + formValues.value.id, values)
+        .then((response) => {
+            const index = users.value.findIndex(user => user.id === response.data.id);
+            users.value[index] = response.data;
+            $('#userFormModal').modal('hide');
+        }).catch((error) => {
+            console.log(error);
+        }).finally(() => {
+            form.value.resetForm();
         });
 }
 // const createUser = () => {
@@ -70,7 +129,7 @@ onMounted(() => {
 
     <div class="content">
         <div class="container-fluid">
-            <button type="button" class="mb-2 btn btn-primary" data-toggle="modal" data-target="#userFormModal">
+            <button type="button" @click.prevent="addUser()" class="mb-2 btn btn-primary">
                 Add New User
             </button>
             <div class="card">
@@ -93,7 +152,11 @@ onMounted(() => {
                                 <td>{{ user.email }}</td>
                                 <td>-</td>
                                 <td>-</td>
-                                <td>-</td>
+                                <td>
+                                    <a href="#" @click.prevent="editUser(user)">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -109,24 +172,27 @@ onMounted(() => {
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Add New User</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">
+                        <span v-if="editing">Edit User</span>
+                        <span v-else>Add New User</span>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <Form @submit="createUser" :validation-schema="schema" v-slot="{ errors }">
+                <Form ref="form" @submit="handleSubmit" :validation-schema="editing ? editUserSchema : createUserSchema" v-slot="{ errors }" :initial-values="formValues">
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }"
+                            <Field name="name" type="text" class="form-control" :class="{ 'is-invalid': errors.name }" :model-value="formValues.name"
                                 id="name" aria-describedby="nameHelp" placeholder="Enter full name" />
                             <span class="invalid-feedback">{{ errors.name }}</span>
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <Field name="email" type="email" class="form-control" :class="{ 'is-invalid': errors.email }"
-                                id="email" aria-describedby="nameHelp" placeholder="Enter full name" />
+                            <Field name="email" type="email" class="form-control" :class="{ 'is-invalid': errors.email }" :model-value="formValues.email"
+                                id="email" aria-describedby="nameHelp" placeholder="Enter email address" />
                             <span class="invalid-feedback">{{ errors.email }}</span>
                         </div>
 
@@ -140,7 +206,10 @@ onMounted(() => {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span v-if="editing">Update</span>
+                            <span v-else>Save</span>
+                        </button>
                     </div>
                 </Form>
             </div>
