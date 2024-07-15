@@ -68,3 +68,4 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 npm install jquery
 npm install vee-validate --save
 npm install yup
+npm install moment

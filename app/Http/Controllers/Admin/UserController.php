@@ -10,6 +10,14 @@ class UserController extends Controller
 {
     public function index()
     {
+        // $users = User::latest()->get()->map(function($user) {
+        //     return [
+        //         'id' => $user->id,
+        //         'name' => $user->name,
+        //         'email' => $user->email,
+        //         'created_at' => $user->formated_created_at
+        //     ];
+        // });
         $users = User::latest()->get();
         return $users;
     }
@@ -40,5 +48,11 @@ class UserController extends Controller
         ]);
 
         return $user;
+    }
+
+    public function delete(User $user)
+    {
+        $user->delete();
+        return response()->noContent();
     }
 }
