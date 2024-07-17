@@ -69,3 +69,4 @@ npm install jquery
 npm install vee-validate --save
 npm install yup
 npm install moment
+npm install laravel-vue-pagination
