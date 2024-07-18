@@ -135,6 +135,40 @@ const updateUser = (values, {setErrors}) => {
 //                 $('#userFormModal').modal('hide');
 //         });
 // }
+const selectedUsers = ref([]);
+const toggleSelection = (user) => {
+    const index = selectedUsers.value.indexOf(user.id);
+    if(index === -1) {
+        selectedUsers.value.push(user.id);
+    } else {
+        selectedUsers.value.splice(index, 1);
+    }
+    console.log(selectedUsers.value);
+}
+
+const bulkDelete = () => {
+    axios.delete('/api/users', {
+        data : {
+            ids: selectedUsers.value
+        }
+    }).then((response) => {
+        users.value.data = users.value.data.filter(user => !selectedUsers.value.includes(user.id));
+        selectedUsers.value = [];
+        selectAll.value = false;
+        toastr.success(response.data.message);
+    })
+}
+const selectAll = ref(false);
+
+const selectAllUsers = () => {
+    if(!selectAll.value) {
+        selectedUsers.value = users.value.data.map(user => user.id);
+    } else {
+        selectedUsers.value = [];
+    }
+
+    console.log(selectAllUsers.value);
+}
 
 watch(searchQuery, ()=> {
     search()
@@ -164,9 +198,15 @@ onMounted(() => {
     <div class="content">
         <div class="container-fluid">
             <div class="d-flex justify-content-between">
-                <button type="button" @click.prevent="addUser()" class="mb-2 btn btn-primary">
-                    Add New User
-                </button>
+                <div>
+                    <button type="button" @click.prevent="addUser()" class="mb-2 btn btn-primary">
+                        Add New User
+                    </button>
+
+                    <button v-if="selectedUsers.length > 0" type="button" @click.prevent="bulkDelete" class="mb-2 ml-2 btn btn-danger">
+                        Delete Selected User
+                    </button>
+                </div>
                 <div>
                     <input type="text" v-model="searchQuery" class="form-control" placeholder="Search..."/>
                 </div>
@@ -176,6 +216,7 @@ onMounted(() => {
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
+                                <th><input type="checkbox" v-model="selectAll" @click="selectAllUsers"/></th>
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -190,6 +231,8 @@ onMounted(() => {
                                 :user=user
                                 @user-deleted="userDeleted"
                                 @edit-user="editUser"
+                                @toggle-selection="toggleSelection"
+                                :select-all="selectAll"
                             >
                             </UserListItem>
                         </tbody>

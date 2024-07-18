@@ -18,7 +18,7 @@ class UserController extends Controller
         //         'created_at' => $user->formated_created_at
         //     ];
         // });
-        $users = User::latest()->paginate(1);
+        $users = User::latest()->paginate(10);
         return $users;
     }
 
@@ -68,9 +68,16 @@ class UserController extends Controller
     public function search()
     {
         $searchQuery = request('query');
-        $users = User::where('name', 'like', "%{$searchQuery}%")->latest()->paginate(1);
+        $users = User::where('name', 'like', "%{$searchQuery}%")->latest()->paginate(10);
 
         return response()->json($users);
+    }
+
+    public function bulkDelete()
+    {
+        User::whereIn('id',request('ids'))->delete();
+
+        return response()->json(['message' => 'Users deleted successfully']);
     }
 
 }
