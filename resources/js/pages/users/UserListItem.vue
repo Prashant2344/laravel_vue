@@ -5,9 +5,10 @@ import axios from 'axios';
 import { useToastr } from '../../toastr';
 
 
-defineProps({
+const props = defineProps({
     user: Object,
-    index: Number 
+    index: Number,
+    selectAll: Boolean
 });
 
 const toastr = useToastr();
@@ -50,10 +51,15 @@ const changeRole = ( user,role ) => {
         toastr.success('Role changed successfully');
     });
 }
+
+const toggleSelection = () => {
+    emit('toggleSelection', props.user);
+}
 </script>
 
 <template>
     <tr>
+        <td><input type="checkbox" :checked="selectAll" @change="toggleSelection"/></td>
         <td>{{ user.id }}</td>
         <td>{{ user.name }}</td>
         <td>{{ user.email }}</td>
