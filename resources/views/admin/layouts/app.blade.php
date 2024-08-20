@@ -201,23 +201,23 @@
                             </router-link>
                         </li>
 
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <router-link to="/admin/settings" active-class="active" class="nav-link">
                                 <i class="nav-icon fas fa-cog"></i>
                                 <p>
                                     Settings
                                 </p>
                             </router-link>
-                        </li>
+                        </li> -->
 
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <router-link to="/admin/profile" active-class="active" class="nav-link">
                                 <i class="nav-icon fas fa-user"></i>
                                 <p>
                                     Profile
                                 </p>
                             </router-link>
-                        </li>
+                        </li> -->
 
                         <li class="nav-item">
                             <a href="#" active-class="active" class="nav-link">

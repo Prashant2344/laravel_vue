@@ -65,8 +65,14 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
+npm install vue
+npm install admin-lte@^3.2 --save
+npm install vue-router
+npm install @vitejs/plugin-vue@2.3.3
 npm install jquery
 npm install vee-validate --save
 npm install yup
 npm install moment
 npm install laravel-vue-pagination
+npm install sweetalert2
+npm install flatpickr --save
