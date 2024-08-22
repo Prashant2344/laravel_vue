@@ -158,6 +158,18 @@ const bulkDelete = () => {
         toastr.success(response.data.message);
     })
 }
+
+const sendMail = () => {
+    axios.post('/subscribe', {
+        ids: selectedUsers.value
+    })
+    .then((response) => {
+        selectedUsers.value = [];
+        selectAll.value = false;
+        toastr.success(response.data.message);
+    })
+}
+
 const selectAll = ref(false);
 
 const selectAllUsers = () => {
@@ -205,6 +217,10 @@ onMounted(() => {
 
                     <button v-if="selectedUsers.length > 0" type="button" @click.prevent="bulkDelete" class="mb-2 ml-2 btn btn-danger">
                         Delete Selected User
+                    </button>
+
+                    <button v-if="selectedUsers.length > 0" type="button" @click.prevent="sendMail" class="mb-2 ml-2 btn btn-info">
+                        Send Mail
                     </button>
                 </div>
                 <div>
