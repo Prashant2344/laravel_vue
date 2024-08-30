@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,5 +45,6 @@ Route::put('/api/appointments/{appointment}/edit', [AppointmentController::class
 Route::delete('/api/appointments/{appointment}', [AppointmentController::class, 'destroy']);
 
 Route::post('/subscribe',[SubscriptionController::class,'index']);
+Route::get('/payment',[PaymentController::class,'index']);
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');
