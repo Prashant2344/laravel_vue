@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -18,6 +20,12 @@ class UserController extends Controller
         //         'created_at' => $user->formated_created_at
         //     ];
         // });
+        // $orders = Order::select('id', 'price', 'tax_rate')
+        //     ->addSelect(DB::raw('calculate_total_price(price, tax_rate) as total_price_with_tax'))
+        //     ->limit(10)
+        //     ->get();
+        //     dd($orders);
+            
         $users = User::latest()->paginate(10);
         return $users;
     }

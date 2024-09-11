@@ -62,4 +62,10 @@ class User extends Authenticatable
             get: fn ($value) => RoleType::from($value)->name,
         );
     }
+    
+
+    public function latestComment()
+    {
+        return $this->hasOne(Comment::class)->latestOfMany();
+    }
 }
